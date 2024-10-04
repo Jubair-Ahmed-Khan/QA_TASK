@@ -1,54 +1,58 @@
-from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium import webdriver
 import time
 
-def login():
+driver = webdriver.Chrome()
 
+def login():
     url = "https://myalice-automation-test.netlify.app/"
     username = "testuser"
     password = "password"
 
-    driver = webdriver.Chrome()
     driver.get(url)
 
-    try:
+    username_path = "username"
+    username_field = WebDriverWait(driver, 10).until(
+        ec.presence_of_element_located((By.ID, username_path))
+    )
 
-        username_field = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.ID, "username"))
-        )
-        password_field = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.ID, "password"))
-        )
-        login_button = WebDriverWait(driver, 10).until(
-            EC.element_to_be_clickable((By.ID, "login-btn"))
-        )
+    password_path = "password"
+    password_field = WebDriverWait(driver, 10).until(
+        ec.presence_of_element_located((By.ID, password_path))
+    )
 
-        time.sleep(3)
-        username_field.send_keys(username)
+    login_button_path = "login-btn"
+    login_button = WebDriverWait(driver, 10).until(
+        ec.element_to_be_clickable((By.ID, login_button_path))
+    )
 
-        time.sleep(3)
-        password_field.send_keys(password)
+    time.sleep(3)
+    username_field.send_keys(username)
 
-        time.sleep(5)
-        login_button.click()
+    time.sleep(3)
+    password_field.send_keys(password)
 
-        time.sleep(8)
-        search_box = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.ID, "manga-search"))
-        )
+    time.sleep(5)
+    login_button.click()
 
-        if search_box.is_displayed():
-            driver.save_screenshot("login_success.png")
-            print("Login successful! Search box found.")
+    time.sleep(8)
+    search_path = "manga-search"
+    search_box = WebDriverWait(driver, 10).until(
+        ec.presence_of_element_located((By.ID, search_path))
+    )
 
-    except Exception as e:
-        print("Error during login:", e)
-        driver.save_screenshot("login_error.png")
+    if search_box.is_displayed():
+        driver.save_screenshot("login_success.png")
+        print("Login successful! Search box found.")
 
-    finally:
-        driver.quit()
 
-# Function Call
-login()
+# login
+try:
+    login()
+except Exception as e:
+    print("Login failed !!! ", e)
+finally:
+    driver.quit()
+

@@ -8,7 +8,6 @@ driver = webdriver.Chrome()
 
 # Function to log in
 def login():
-
     url = "https://myalice-automation-test.netlify.app/"
     username = "testuser"
     password = "password"
@@ -55,45 +54,50 @@ def login():
         driver.save_screenshot("login_error.png")
 
 
-# Function to search for manga and verify results
-def search_manga(manga_name):
-    search_id = 'manga-search'
-    search_box = driver.find_element(By.ID, search_id)
-
-    if search_box.is_displayed():
-        search_box.clear()
-        search_box.send_keys(manga_name)
-
+# Function to check manga details
+def manga_details():
     time.sleep(2)
-    search_button_path = '//button[contains(text(),"Search")]'
-    search_button = driver.find_element(By.XPATH, search_button_path)
-    search_button.click()
 
-    time.sleep(2)
-    card_path = f'//h3[contains(text(),"{manga_name}")]'
-    manga_cards = driver.find_elements(By.XPATH,card_path)
+    span_xpath = '//h3[@id="manga-name"]/following-sibling::p//span[contains(text(), "Details")]'
+    span_element = driver.find_element(By.XPATH, span_xpath)
+    span_element.click()
 
-    driver.save_screenshot(f"search_result_{manga_name}.png")
+    modal_path = '//*[@id="root"]/div/div[3]'
+    modal = driver.find_element(By.XPATH, modal_path)
 
-    if len(manga_cards) > 0:
-        result = f'Search for "{manga_name}" returned {len(manga_cards)} results.'
-        print(result)
-        for card in manga_cards:
-            print(card.text)
+    time.sleep(3)
+    if modal.is_displayed():
+        driver.save_screenshot("modal.png")
+        print("Modal displayed")
+
+        card_title_path = '//*[@id="root"]/div/div[3]/div/h3'
+        card_title = driver.find_element(By.XPATH, card_title_path)
+        print("Card title = ",card_title.text)
+
+        card_details_path = '//*[@id="root"]/div/div[3]/div/p'
+        card_details = driver.find_element(By.XPATH, card_details_path)
+        print("Card Details = ", card_details.text)
+
+        time.sleep(3)
+        close_button_path = '//*[@id="root"]/div/div[3]/div/button'
+        close_button = driver.find_element(By.XPATH, close_button_path)
+        close_button.click()
+
+        try:
+            modal_path = '//*[@id="root"]/div/div[3]'
+            driver.find_element(By.XPATH, modal_path)
+        except:
+            print("Modal closed")
     else:
-        result = f'No results found for "{manga_name}".'
-        print(result)
+        print("Modal not displayed")
 
 
-# login, search and display
+# login, display modal with details, and close modal
 try:
     login()
-    search_manga("Naruto")
-    search_manga("One Piece")
-    search_manga("Seven Deadly Sins")
-    search_manga("No manga found")
+    manga_details()
 except Exception as e:
-    print("Error during search:", e)
-    driver.save_screenshot("search_error.png")
+    print("Error during showing details:", e)
+    driver.save_screenshot("details_error.png")
 finally:
     driver.quit()
