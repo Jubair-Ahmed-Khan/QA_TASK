@@ -70,9 +70,13 @@ def manga_details():
         driver.save_screenshot("modal.png")
         print("Modal displayed")
 
+        card_image_path = '//*[@id="root"]/div/div[3]/div/img'
+        card_image = driver.find_element(By.XPATH, card_image_path)
+        print("Card Image URL = ", card_image.get_attribute("src"))
+
         card_title_path = '//*[@id="root"]/div/div[3]/div/h3'
         card_title = driver.find_element(By.XPATH, card_title_path)
-        print("Card title = ",card_title.text)
+        print("Card Title = ",card_title.text)
 
         card_details_path = '//*[@id="root"]/div/div[3]/div/p'
         card_details = driver.find_element(By.XPATH, card_details_path)
